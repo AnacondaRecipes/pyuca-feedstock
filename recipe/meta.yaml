@@ -1,41 +1,54 @@
 {% set name = "pyuca" %}
 {% set version = "1.2" %}
-{% set hash_type = "sha256" %}
-{% set hash = "8a382fe74627f08c0d18908c0713ca4a20aad5385f077579e56208beea2893b2" %}
 
 package:
   name: {{ name }}
   version: {{ version }}
 
 source:
-  fn: {{ name }}-{{ version }}.tar.gz
   url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  {{ hash_type }}: {{ hash }}
+  sha256: 8a382fe74627f08c0d18908c0713ca4a20aad5385f077579e56208beea2893b2
+  patches:
+    - unicode_license.patch
 
 build:
-  noarch: python
   number: 1
-  script: python -m pip install --no-deps --ignore-installed .
+  script: {{ PYTHON }} -m pip install --no-deps --ignore-installed --no-build-isolation .
 
 requirements:
+  build:
+    - patch     # [not win]
+    - m2-patch  # [win]
   host:
     - pip
     - python
     - setuptools
-
+    - wheel
   run:
     - python
 
 test:
   imports:
     - pyuca
+  requires:
+    - pip
+  commands:
+    - pip check
 
 about:
   home: https://pypi.org/project/pyuca
-  license: MIT
-  # license file currently not on sdist, see https://github.com/jtauber/pyuca/pull/9
-  #license_file: LICENSE
+  license: MIT AND Unicode-3.0
+  license_family: MIT
+  license_file:
+    - LICENSE
+    - LICENSE-Unicode-3.0
+    - COPYING
   summary: a Python implementation of the Unicode Collation Algorithm
+  description: |
+    This is a Python implementation of the Unicode Collation Algorithm (UCA). It passes 100% of the UCA conformance
+    tests for Unicode 5.2.0 (Python 2.7), Unicode 6.3.0 (Python 3.3+), Unicode 8.0.0 (Python 3.5+), Unicode 9.0.0
+    (Python 3.6+), and Unicode 10.0.0 (Python 3.7+) with a variable-weighting setting of Non-ignorable.
+  doc_url: https://github.com/jtauber/pyuca/blob/master/README.md
   dev_url: https://github.com/jtauber/pyuca
 
 extra:
